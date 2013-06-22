@@ -107,7 +107,6 @@ setup(
     'Topic :: Utilities',
   ],
 
-  # todo: pull in a changelog from subversion?...
   long_description      = README,
 
 )
