@@ -42,10 +42,18 @@ def qtrepl(match):
     else:
       ret += '\n  ' + line
   return ret + '\n'
+
+#------------------------------------------------------------------------------
+mdimg = re.compile(r'!\[([^\]]*)\]\((.*?) "([^"]*)"\)')
+imgrepl = '''\
+.. image:: \\2
+   :alt: \\1
+'''
 #------------------------------------------------------------------------------
 def md2rst(text):
   text = mdquote.sub(qtrepl, text)
   text = mdheader.sub(hdrepl, text)
+  text = mdimg.sub(imgrepl, text)
   return text
 #------------------------------------------------------------------------------
 README = md2rst(README)
@@ -69,7 +77,7 @@ setup(
 
   # generic info
   name                  = 'pxml',
-  version               = '0.2.3',
+  version               = '0.2.4',
 
   # build instructions
   packages              = find_packages(),
