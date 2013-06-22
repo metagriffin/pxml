@@ -69,7 +69,7 @@ setup(
 
   # generic info
   name                  = 'pxml',
-  version               = '0.2.1',
+  version               = '0.2.2',
 
   # build instructions
   packages              = find_packages(),
