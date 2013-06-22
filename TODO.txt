@@ -1,0 +1,3 @@
+* make colors configurable (use .rc file?)
+* do some smashing things with comments
+* canonicalize the order of attributes
