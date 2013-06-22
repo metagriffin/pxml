@@ -10,7 +10,7 @@ $ pip install pxml
 
 ## On the Command-Line
 
-``` bash
+```
 $ echo '<root><node attr="value">foo</node></root>' | pxml
 <?xml version="1.0" encoding="utf-8"?>
 <root>
