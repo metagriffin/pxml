@@ -65,9 +65,6 @@ entry_points = {
     ],
   }
 
-print README
-sys.exit(0)
-
 setup(
 
   # generic info
