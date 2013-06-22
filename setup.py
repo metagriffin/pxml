@@ -30,9 +30,9 @@ def hdrepl(match):
   ret = match.group(2).strip()
   return ret + '\n' + ( mdlevels[lvl] * len(ret) ) + '\n'
 #------------------------------------------------------------------------------
-mdquote = re.compile('^```( python)?\n(.*?)\n```\n', flags=re.MULTILINE|re.DOTALL)
+mdquote = re.compile('^```(?: ?(\w+))?\n(.*?)\n```\n', flags=re.MULTILINE|re.DOTALL)
 def qtrepl(match):
-  if match.group(1) == ' python':
+  if match.group(1) == 'python':
     ret = '.. code-block:: python\n'
   else:
     ret = '::\n'
@@ -65,11 +65,14 @@ entry_points = {
     ],
   }
 
+print README
+sys.exit(0)
+
 setup(
 
   # generic info
   name                  = 'pxml',
-  version               = '0.2.2',
+  version               = '0.2.3',
 
   # build instructions
   packages              = find_packages(),
