@@ -134,7 +134,7 @@ def cxml_document(doc, output, enc, cspec):
 #------------------------------------------------------------------------------
 class ColorSpec(object):
   def __init__(self):
-    t = blessings.Terminal()
+    t = blessings.Terminal(force_styling=True)
     self.reset          = t.normal
     self.xmlDeclaration = t.green
     self.angleBracket   = t.bold_magenta
