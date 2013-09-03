@@ -14,6 +14,8 @@ import pxml
 #------------------------------------------------------------------------------
 class TestPxml(unittest.TestCase):
 
+  maxDiff = None
+
   #----------------------------------------------------------------------------
   def test_simple(self):
     src = StringIO('<root><zig><zog a="b">foo</zog><zog>bar</zog></zig></root>')
@@ -34,10 +36,10 @@ class TestPxml(unittest.TestCase):
   def test_color(self):
     src = StringIO('<root><zog a="b">foo</zog></root>')
     chk = '''\
-<?xml version="1.0" encoding="utf-8"?>
-<root>
-  <zog a="b">foo</zog>
-</root>
+[32m<?xml version="1.0" encoding="utf-8"?>(B[m
+[1m[35m<(B[m[1m[34mroot(B[m[1m[35m>(B[m
+  [1m[35m<(B[m[1m[34mzog(B[m [1m[34ma(B[m[1m[35m="(B[mb[1m[35m"(B[m[1m[35m>(B[mfoo[1m[35m</(B[m[1m[34mzog(B[m[1m[35m>(B[m
+[1m[35m</(B[m[1m[34mroot(B[m[1m[35m>(B[m
 '''
     out = StringIO()
     self.assertTrue(pxml.prettify(src, out, color=True))
