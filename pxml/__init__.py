@@ -15,6 +15,8 @@ import sys, re, argparse, xml.dom, xml.dom.minidom, pkg_resources
 import blessings
 
 #------------------------------------------------------------------------------
+DEFAULT_ENCODING = 'UTF-8'
+ACCEPTABLE_COLORIZATION_ENCODINGS = ('UTF-8', 'utf-8')
 class UnsupportedEncoding(Exception): pass
 
 #------------------------------------------------------------------------------
@@ -144,9 +146,11 @@ class ColorSpec(object):
     self.comment        = t.red
 
 #------------------------------------------------------------------------------
-def colorizeXml(dom, output, encoding='utf-8', colorspec=None):
-  if encoding != 'utf-8':
-    # todo: what is the problem with other encodings?... paranoid, eh?
+def colorizeXml(dom, output, encoding=DEFAULT_ENCODING, colorspec=None):
+  if encoding not in ACCEPTABLE_COLORIZATION_ENCODINGS:
+    # restricting colorized output to UTF-8 encoding only. is there actually
+    # a problem with other encodings?... not sure, just being paranoid.
+    # todo: look into this and see if this is really necessary.
     raise UnsupportedEncoding(encoding)
   if colorspec is None or colorspec is True:
     colorspec = ColorSpec()
@@ -155,7 +159,8 @@ def colorizeXml(dom, output, encoding='utf-8', colorspec=None):
   return True
 
 #------------------------------------------------------------------------------
-def prettify(input, output, strict=True, indentString='  ', color=False):
+def prettify(input, output, strict=True, indentString='  ', color=False,
+             encoding=DEFAULT_ENCODING):
   '''
   Converts the input data stream `input` (which must be a file input
   like object) to `output` (which must be a file output like object)
@@ -169,16 +174,38 @@ def prettify(input, output, strict=True, indentString='  ', color=False):
   * Normalizing attribute rendering.
     TODO: that should include canonical ordering of attributes...
 
-  If the input stream cannot be parsed by python's xml.dom.minidom,
-  then if `strict` is True (the default), an exception is raised. If
-  `strict` is False, then the input data is stream to the output
-  as-is.
+  :Parameters:
+
+  strict : bool, default: true, optional
+    If the input stream cannot be parsed by python's xml.dom.minidom,
+    then if `strict` is True (the default), an exception is raised. If
+    `strict` is False, then the input data is streamed to `output`
+    as-is.
+
+  indentString : str, default: '  ', optional
+    The indentation to add to the output stream when entering into a
+    sub-element. Note that this indentation is only added if it will
+    remain "ignorable whitespace" according to the XML specification.
+
+  color : bool, default: false, optional
+    Whether or not to add *terminfo* terminal colorization sequences
+    to add XML syntax highlighting, including element names, attribute
+    names, and other XML syntax characters.
+
+  encoding : str, default: 'UTF-8', optional
+    Specify the encoding to use when rendering the XML. By default, it
+    uses ``"UTF-8"``.
 
   :Returns:
 
-  True: the input stream was successfully converted.
-  False: a parsing error occurred and `strict` was False.
-  Exception: other errors (such as IOErrors) occurred.
+  True
+    the input stream was successfully converted.
+
+  False
+    a parsing error occurred and `strict` was False.
+
+  Exception
+    other errors (such as IOErrors) occurred.
   '''
   data = input.read()
   try:
@@ -191,8 +218,8 @@ def prettify(input, output, strict=True, indentString='  ', color=False):
   removeIgnorableWhitespace(dom)
   indentXml(dom, dom.documentElement, indentString)
   if color:
-    return colorizeXml(dom, output, encoding='utf-8', colorspec=color)
-  xout = dom.toxml(encoding='utf-8').encode('utf-8') + '\n'
+    return colorizeXml(dom, output, encoding=encoding, colorspec=color)
+  xout = dom.toxml(encoding=encoding).encode(encoding) + '\n'
   output.write(re.sub(r'^(<\?xml[^>]+?>)', '\\1\n', xout))
   return True
 

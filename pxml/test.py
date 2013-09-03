@@ -20,7 +20,7 @@ class TestPxml(unittest.TestCase):
   def test_simple(self):
     src = StringIO('<root><zig><zog a="b">foo</zog><zog>bar</zog></zig></root>')
     chk = '''\
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <root>
   <zig>
     <zog a="b">foo</zog>
@@ -36,7 +36,7 @@ class TestPxml(unittest.TestCase):
   def test_color(self):
     src = StringIO('<root><zog a="b">foo</zog></root>')
     chk = '''\
-[32m<?xml version="1.0" encoding="utf-8"?>(B[m
+[32m<?xml version="1.0" encoding="UTF-8"?>(B[m
 [1m[35m<(B[m[1m[34mroot(B[m[1m[35m>(B[m
   [1m[35m<(B[m[1m[34mzog(B[m [1m[34ma(B[m[1m[35m="(B[mb[1m[35m"(B[m[1m[35m>(B[mfoo[1m[35m</(B[m[1m[34mzog(B[m[1m[35m>(B[m
 [1m[35m</(B[m[1m[34mroot(B[m[1m[35m>(B[m
@@ -45,12 +45,25 @@ class TestPxml(unittest.TestCase):
     self.assertTrue(pxml.prettify(src, out, color=True))
     self.assertMultiLineEqual(out.getvalue(), chk)
 
+  #----------------------------------------------------------------------------
+  def test_encodingOverride(self):
+    src = StringIO('<root><zog a="b">foo</zog></root>')
+    chk = '''\
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <zog a="b">foo</zog>
+</root>
+'''
+    out = StringIO()
+    self.assertTrue(pxml.prettify(src, out, encoding='utf-8'))
+    self.assertMultiLineEqual(out.getvalue(), chk)
+
 # TODO: enable this when attribute order is canonicalized...
 #   #----------------------------------------------------------------------------
 #   def test_canonicalAttributeOrder(self):
 #     src = StringIO('<root><zig a="1" c="2" b="3">foo</zig></root>')
 #     chk = '''\
-# <?xml version="1.0" encoding="utf-8"?>
+# <?xml version="1.0" encoding="UTF-8"?>
 # <root>
 #   <zig a="1" b="3" c="2">foo</zig>
 # </root>

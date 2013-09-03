@@ -19,7 +19,7 @@ On the Command-Line
 .. code-block:: bash
 
   $ echo '<root><node attr="value">foo</node></root>' | pxml
-  <?xml version="1.0" encoding="utf-8"?>
+  <?xml version="1.0" encoding="UTF-8"?>
   <root>
     <node attr="value">foo</node>
   </root>
@@ -43,7 +43,7 @@ As a Python Module
   pxml.prettify(src, out)
 
   assert(out.getvalue() == '''\
-  <?xml version="1.0" encoding="utf-8"?>
+  <?xml version="1.0" encoding="UTF-8"?>
   <root>
     <node attr="value">foo</node>
   </root>
