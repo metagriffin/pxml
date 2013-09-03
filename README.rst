@@ -4,12 +4,14 @@ Pretty-Print XML
 
 A python library and command-line tool to "prettify" and colorize XML.
 
+
 Installation
 ============
 
 .. code-block:: bash
 
   $ pip install pxml
+
 
 On the Command-Line
 ===================
@@ -24,7 +26,9 @@ On the Command-Line
 
 And add some color:
 
-![pxml with color](https://raw.github.com/metagriffin/pxml/master/pxml-color.png "pxml with color")
+.. image:: https://raw.github.com/metagriffin/pxml/master/pxml-color.png
+  :alt: pxml with color
+
 
 As a Python Module
 ==================
