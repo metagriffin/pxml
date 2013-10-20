@@ -11,7 +11,7 @@ Pretty-prints XML, nothing more :)
 '''
 
 #------------------------------------------------------------------------------
-import sys, re, argparse, xml.dom, xml.dom.minidom, pkg_resources
+import sys, re, argparse, xml.dom, xml.dom.minidom, pkg_resources, six
 import blessings
 
 #------------------------------------------------------------------------------
@@ -210,7 +210,7 @@ def prettify(input, output, strict=True, indentString='  ', color=False,
   data = input.read()
   try:
     dom = xml.dom.minidom.parseString(data)
-  except:
+  except Exception:
     if strict:
       raise
     output.write(data)
@@ -228,6 +228,23 @@ class lib:
   def version(self):
     return pkg_resources.require('pxml')[0].version
 lib = lib()
+
+#------------------------------------------------------------------------------
+class TestMixin(object):
+  def assertXmlEqual(self, xml1, xml2):
+    try:
+      dom1 = xml.dom.minidom.parseString(xml1)
+      dom2 = xml.dom.minidom.parseString(xml2)
+    except Exception:
+      return self.assertEqual(xml1, xml2)
+    try:
+      return self.assertEqual(dom1, dom2)
+    except AssertionError:
+      out1 = six.StringIO()
+      out2 = six.StringIO()
+      prettify(six.StringIO(xml1), out1)
+      prettify(six.StringIO(xml2), out2)
+      return self.assertMultiLineEqual(out1.getvalue(), out2.getvalue())
 
 #------------------------------------------------------------------------------
 def main(args=None):
@@ -271,10 +288,6 @@ def main(args=None):
     source = open(options.filename, 'rb')
   prettify(source, sys.stdout, options.strict, options.indent, options.color)
   return 0
-
-#------------------------------------------------------------------------------
-if __name__ == '__main__':
-  sys.exit(main())
 
 #------------------------------------------------------------------------------
 # end of $Id: pxml.py 346 2012-08-12 17:22:39Z griffin $

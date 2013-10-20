@@ -58,19 +58,40 @@ class TestPxml(unittest.TestCase):
     self.assertTrue(pxml.prettify(src, out, encoding='utf-8'))
     self.assertMultiLineEqual(out.getvalue(), chk)
 
-# TODO: enable this when attribute order is canonicalized...
-#   #----------------------------------------------------------------------------
-#   def test_canonicalAttributeOrder(self):
-#     src = StringIO('<root><zig a="1" c="2" b="3">foo</zig></root>')
-#     chk = '''\
-# <?xml version="1.0" encoding="UTF-8"?>
-# <root>
-#   <zig a="1" b="3" c="2">foo</zig>
-# </root>
-# '''
-#     out = StringIO()
-#     self.assertTrue(pxml.prettify(src, out))
-#     self.assertMultiLineEqual(out.getvalue(), chk)
+  #----------------------------------------------------------------------------
+  def test_canonicalAttributeOrder(self):
+    src = StringIO('<root><zig a="1" c="2" b="3">foo</zig></root>')
+    chk = '''\
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  <zig a="1" b="3" c="2">foo</zig>
+</root>
+'''
+    out = StringIO()
+    self.assertTrue(pxml.prettify(src, out))
+    self.assertMultiLineEqual(out.getvalue(), chk)
+
+#------------------------------------------------------------------------------
+class TestPxmlTestMixin(unittest.TestCase, pxml.TestMixin):
+
+  def test_equivalent_xml(self):
+    src = '<root  ><node a="1" b="0"/></root>'
+    chk = '<root><node   b="0" a="1"  /></root  >'
+    self.assertXmlEqual(src, chk)
+
+  def test_different_xml(self):
+    src = '<root  ><node a="1" b="0"/></root>'
+    chk = '<root><node   b="1" a="0"  /></root  >'
+    with self.assertRaises(AssertionError) as cm:
+      self.assertXmlEqual(src, chk)
+    self.assertMultiLineEqual(cm.exception.message, '''\
+'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root>\\ [truncated]... != '<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root>\\ [truncated]...
+  <?xml version="1.0" encoding="UTF-8"?>
+  <root>
+-   <node a="1" b="0"/>
++   <node a="0" b="1"/>
+  </root>
+''')
 
 #------------------------------------------------------------------------------
 # end of $Id$
