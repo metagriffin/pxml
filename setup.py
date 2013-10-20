@@ -14,9 +14,9 @@ if sys.hexversion < 0x02070000:
   raise RuntimeError('This package requires python 2.7 or better')
 
 heredir = os.path.abspath(os.path.dirname(__file__))
-def read(*parts):
+def read(*parts, **kw):
   try:    return open(os.path.join(heredir, *parts)).read()
-  except: return ''
+  except: return kw.get('default', '')
 
 test_dependencies = [
   'nose                 >= 1.3.0',
@@ -26,6 +26,7 @@ test_dependencies = [
 dependencies = [
   'distribute           >= 0.6.24',
   'blessings            >= 1.5',
+  'six                  >= 1.4.1',
   ]
 
 entrypoints = {
