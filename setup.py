@@ -20,7 +20,7 @@ def read(*parts, **kw):
 
 test_dependencies = [
   'nose                 >= 1.3.0',
-  'coverage             >= 3.6',
+  'coverage             >= 3.5.3',
   ]
 
 dependencies = [
@@ -51,7 +51,7 @@ classifiers = [
 
 setup(
   name                  = 'pxml',
-  version               = '0.2.6',
+  version               = '0.2.7',
   description           = 'A python library and command-line tool to "prettify" and colorize XML.',
   long_description      = read('README.rst'),
   classifiers           = classifiers,
