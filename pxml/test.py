@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #------------------------------------------------------------------------------
 # file: $Id: pxml.py 346 2012-08-12 17:22:39Z griffin $
 # desc: pretty-prints xml, nothing more :)
