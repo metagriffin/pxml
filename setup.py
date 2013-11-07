@@ -51,7 +51,7 @@ classifiers = [
 
 setup(
   name                  = 'pxml',
-  version               = '0.2.7',
+  version               = read('VERSION.txt', default='0.0.1').strip(),
   description           = 'A python library and command-line tool to "prettify" and colorize XML.',
   long_description      = read('README.rst'),
   classifiers           = classifiers,
