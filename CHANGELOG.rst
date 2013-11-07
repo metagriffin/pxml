@@ -3,7 +3,7 @@ ChangeLog
 =========
 
 
-0.2.8
+0.2.9
 =====
 
 * First tagged release
