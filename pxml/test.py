@@ -72,7 +72,7 @@ class TestPxml(unittest.TestCase):
     self.assertMultiLineEqual(out.getvalue(), chk)
 
 #------------------------------------------------------------------------------
-class TestPxmlTestMixin(unittest.TestCase, pxml.TestMixin):
+class TestPxmlTestMixin(unittest.TestCase, pxml.XmlTestMixin):
 
   def test_equivalent_xml(self):
     src = '<root  ><node a="1" b="0"/></root>'
