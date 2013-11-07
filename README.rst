@@ -54,7 +54,7 @@ As a Python Module
 Unit Testing
 ============
 
-The `pxml.Mixin` class adds the `assertXmlEqual` method to the
+The `pxml.XmlTestMixin` class adds the `assertXmlEqual` method to the
 subclass which allows easy semantic comparison that two XML structures
 are equivalent. It does so by ignoring ignorable whitespace, attribute
 order, quote types, and other differences that are byte-level
@@ -66,7 +66,7 @@ differences in "prettified" XML for easier comparison.
 
   import unittest, pxml
 
-  class MyTestCase(unittest.TestCase, pxml.Mixin):
+  class MyTestCase(unittest.TestCase, pxml.XmlTestMixin):
 
     def test_equivalent_xml(self):
       src = '<root  ><node a="1" b="0"/></root>'

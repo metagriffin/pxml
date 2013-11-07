@@ -230,7 +230,7 @@ class lib:
 lib = lib()
 
 #------------------------------------------------------------------------------
-class TestMixin(object):
+class XmlTestMixin(object):
   def assertXmlEqual(self, xml1, xml2, msg=None):
     try:
       dom1 = xml.dom.minidom.parseString(xml1)
