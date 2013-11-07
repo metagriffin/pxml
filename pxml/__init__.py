@@ -231,20 +231,25 @@ lib = lib()
 
 #------------------------------------------------------------------------------
 class TestMixin(object):
-  def assertXmlEqual(self, xml1, xml2):
+  def assertXmlEqual(self, xml1, xml2, msg=None):
     try:
       dom1 = xml.dom.minidom.parseString(xml1)
       dom2 = xml.dom.minidom.parseString(xml2)
     except Exception:
-      return self.assertEqual(xml1, xml2)
+      return self.assertEqual(xml1, xml2, msg=msg)
     try:
-      return self.assertEqual(dom1, dom2)
+      return self.assertEqual(dom1, dom2, msg=msg)
     except AssertionError:
       out1 = six.StringIO()
       out2 = six.StringIO()
       prettify(six.StringIO(xml1), out1)
       prettify(six.StringIO(xml2), out2)
-      return self.assertMultiLineEqual(out1.getvalue(), out2.getvalue())
+      return self.assertMultiLineEqual(out1.getvalue(), out2.getvalue(), msg=msg)
+  def assertNotXmlEqual(self, xml1, xml2, msg=None):
+    try:
+      self.assertXmlEqual(xml1, xml2)
+      self.fail(msg or '%r == %r' % (xml1, xml2))
+    except AssertionError: return
 
 #------------------------------------------------------------------------------
 def main(args=None):
