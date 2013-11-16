@@ -28,6 +28,13 @@ import sys, re, argparse, xml.dom, xml.dom.minidom, pkg_resources, six
 import blessings
 
 #------------------------------------------------------------------------------
+class lib:
+  @property
+  def version(self):
+    return pkg_resources.get_distribution('pxml').version
+lib = lib()
+
+#------------------------------------------------------------------------------
 DEFAULT_ENCODING = 'UTF-8'
 ACCEPTABLE_COLORIZATION_ENCODINGS = ('UTF-8', 'utf-8')
 class UnsupportedEncoding(Exception): pass
@@ -235,12 +242,6 @@ def prettify(input, output, strict=True, indentString='  ', color=False,
   xout = dom.toxml(encoding=encoding).encode(encoding) + '\n'
   output.write(re.sub(r'^(<\?xml[^>]+?>)', '\\1\n', xout))
   return True
-
-class lib:
-  @property
-  def version(self):
-    return pkg_resources.require('pxml')[0].version
-lib = lib()
 
 #------------------------------------------------------------------------------
 class XmlTestMixin(object):
