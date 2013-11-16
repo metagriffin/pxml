@@ -274,10 +274,6 @@ def main(args=None):
     epilog='%(prog)s ' + lib.version,
     )
 
-  # cli = OptionParser(version='%prog ' + 'TODO', #common.getVersion(__name__),
-  #                    usage='%prog [options] [FILENAME | "-"]'
-  #                    )
-
   cli.add_argument(
     '-s', '--strict',
     default=False, action='store_true',
