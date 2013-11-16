@@ -45,6 +45,10 @@ class TestPxml(unittest.TestCase):
     self.assertMultiLineEqual(out.getvalue(), chk)
 
   #----------------------------------------------------------------------------
+  def test_version(self):
+    self.assertRegexpMatches(pxml.lib.version, r'^\d+\.\d+\.\d+$')
+
+  #----------------------------------------------------------------------------
   def test_color(self):
     src = StringIO('<root><zog a="b">foo</zog></root>')
     chk = '''\
@@ -86,11 +90,13 @@ class TestPxml(unittest.TestCase):
 #------------------------------------------------------------------------------
 class TestPxmlTestMixin(unittest.TestCase, pxml.XmlTestMixin):
 
+  #----------------------------------------------------------------------------
   def test_equivalent_xml(self):
     src = '<root  ><node a="1" b="0"/></root>'
     chk = '<root><node   b="0" a="1"  /></root  >'
     self.assertXmlEqual(src, chk)
 
+  #----------------------------------------------------------------------------
   def test_different_xml(self):
     src = '<root  ><node a="1" b="0"/></root>'
     chk = '<root><node   b="1" a="0"  /></root  >'
