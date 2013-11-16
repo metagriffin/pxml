@@ -239,7 +239,7 @@ def prettify(input, output, strict=True, indentString='  ', color=False,
   indentXml(dom, dom.documentElement, indentString)
   if color:
     return colorizeXml(dom, output, encoding=encoding, colorspec=color)
-  xout = dom.toxml(encoding=encoding).encode(encoding) + '\n'
+  xout = dom.toxml(encoding=encoding) + '\n'
   output.write(re.sub(r'^(<\?xml[^>]+?>)', '\\1\n', xout))
   return True
 
