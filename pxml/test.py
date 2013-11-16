@@ -114,10 +114,13 @@ class TestPxmlTestMixin(unittest.TestCase, pxml.XmlTestMixin):
   #----------------------------------------------------------------------------
   def test_unicode(self):
     src = '<root><node>this &#x2013; that.</node></root>'
-    chk1 = '<root  ><node	\n>this \xe2\x80\x93 that.</node\n></root  >'
-    chk2 = '<?xml version="1.0" encoding="UTF-8"?>\n' + chk1
-    self.assertXmlEqual(src, chk2)
+    chkU = '<root  ><node	\n>this \xe2\x80\x93 that.</node\n></root  >'
+    chk1 = '<?xml version="1.0" encoding="UTF-8"?>\n' + chkU
+    chk2 = chkU
+    chk3 = '<root ><node >this – that.</node ></root >'
     self.assertXmlEqual(src, chk1)
+    self.assertXmlEqual(src, chk2)
+    self.assertXmlEqual(src, chk3)
 
 #------------------------------------------------------------------------------
 # end of $Id$
