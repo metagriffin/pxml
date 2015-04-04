@@ -20,7 +20,7 @@
 #------------------------------------------------------------------------------
 
 import unittest
-from StringIO import StringIO
+import six
 import pxml
 
 #------------------------------------------------------------------------------
@@ -30,8 +30,8 @@ class TestPxml(unittest.TestCase):
 
   #----------------------------------------------------------------------------
   def test_simple(self):
-    src = StringIO('<root><zig><zog a="b">foo</zog><zog>bar</zog></zig></root>')
-    chk = '''\
+    src = six.BytesIO(b'<root><zig><zog a="b">foo</zog><zog>bar</zog></zig></root>')
+    chk = b'''\
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
   <zig>
@@ -40,9 +40,9 @@ class TestPxml(unittest.TestCase):
   </zig>
 </root>
 '''
-    out = StringIO()
+    out = six.BytesIO()
     self.assertTrue(pxml.prettify(src, out))
-    self.assertMultiLineEqual(out.getvalue(), chk)
+    self.assertEqual(out.getvalue(), chk)
 
   #----------------------------------------------------------------------------
   def test_version(self):
@@ -50,60 +50,73 @@ class TestPxml(unittest.TestCase):
 
   #----------------------------------------------------------------------------
   def test_color(self):
-    src = StringIO('<root><zog a="b">foo</zog></root>')
-    chk = '''\
+    src = six.BytesIO(b'<root><zog a="b">foo</zog></root>')
+    chk = b'''\
 [32m<?xml version="1.0" encoding="UTF-8"?>(B[m
 [1m[35m<(B[m[1m[34mroot(B[m[1m[35m>(B[m
   [1m[35m<(B[m[1m[34mzog(B[m [1m[34ma(B[m[1m[35m="(B[mb[1m[35m"(B[m[1m[35m>(B[mfoo[1m[35m</(B[m[1m[34mzog(B[m[1m[35m>(B[m
 [1m[35m</(B[m[1m[34mroot(B[m[1m[35m>(B[m
 '''
-    out = StringIO()
+    out = six.BytesIO()
     self.assertTrue(pxml.prettify(src, out, color=True))
-    self.assertMultiLineEqual(out.getvalue(), chk)
+    self.assertEqual(out.getvalue(), chk)
 
   #----------------------------------------------------------------------------
   def test_encodingOverride(self):
-    src = StringIO('<root><zog a="b">foo</zog></root>')
-    chk = '''\
+    src = six.BytesIO(b'<root><zog a="b">foo</zog></root>')
+    chk = b'''\
 <?xml version="1.0" encoding="utf-8"?>
 <root>
   <zog a="b">foo</zog>
 </root>
 '''
-    out = StringIO()
+    out = six.BytesIO()
     self.assertTrue(pxml.prettify(src, out, encoding='utf-8'))
-    self.assertMultiLineEqual(out.getvalue(), chk)
+    self.assertEqual(out.getvalue(), chk)
 
   #----------------------------------------------------------------------------
   def test_canonicalAttributeOrder(self):
-    src = StringIO('<root><zig a="1" c="2" b="3">foo</zig></root>')
-    chk = '''\
+    src = six.BytesIO(b'<root><zig a="1" c="2" b="3">foo</zig></root>')
+    chk = b'''\
 <?xml version="1.0" encoding="UTF-8"?>
 <root>
   <zig a="1" b="3" c="2">foo</zig>
 </root>
 '''
-    out = StringIO()
+    out = six.BytesIO()
     self.assertTrue(pxml.prettify(src, out))
-    self.assertMultiLineEqual(out.getvalue(), chk)
+    self.assertEqual(out.getvalue(), chk)
 
 #------------------------------------------------------------------------------
 class TestPxmlTestMixin(unittest.TestCase, pxml.XmlTestMixin):
 
+  maxDiff = None
+
   #----------------------------------------------------------------------------
   def test_equivalent_xml(self):
-    src = '<root  ><node a="1" b="0"/></root>'
-    chk = '<root><node   b="0" a="1"  /></root  >'
+    src = b'<root  ><node a="1" b="0"/></root>'
+    chk = b'<root><node   b="0" a="1"  /></root  >'
     self.assertXmlEqual(src, chk)
 
   #----------------------------------------------------------------------------
   def test_different_xml(self):
-    src = '<root  ><node a="1" b="0"/></root>'
-    chk = '<root><node   b="1" a="0"  /></root  >'
+    src = b'<root  ><node a="1" b="0"/></root>'
+    chk = b'<root><node   b="1" a="0"  /></root  >'
     with self.assertRaises(AssertionError) as cm:
       self.assertXmlEqual(src, chk)
-    self.assertMultiLineEqual(cm.exception.message, '''\
-'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root>\\ [truncated]... != '<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root>\\ [truncated]...
+    if six.PY2:
+      self.assertMultiLineEqual(str(cm.exception), '''\
+u'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root> [truncated]... != u'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root> [truncated]...
+  <?xml version="1.0" encoding="UTF-8"?>
+  <root>
+-   <node a="1" b="0"/>
++   <node a="0" b="1"/>
+  </root>
+''')
+    else:
+      # python 3... (its truncation algorithm is different)
+      self.assertMultiLineEqual(str(cm.exception), '''\
+'<?xm[14 chars]" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root>\\n' != '<?xm[14 chars]" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root>\\n'
   <?xml version="1.0" encoding="UTF-8"?>
   <root>
 -   <node a="1" b="0"/>
@@ -113,14 +126,15 @@ class TestPxmlTestMixin(unittest.TestCase, pxml.XmlTestMixin):
 
   #----------------------------------------------------------------------------
   def test_unicode(self):
-    src = '<root><node>this &#x2013; that.</node></root>'
-    chkU = '<root  ><node	\n>this \xe2\x80\x93 that.</node\n></root  >'
-    chk1 = '<?xml version="1.0" encoding="UTF-8"?>\n' + chkU
+    src  = b'<root><node>this &#x2013; that.</node></root>'
+    chkU = b'<root  ><node	\n>this \xe2\x80\x93 that.</node\n></root  >'
+    chk1 = b'<?xml version="1.0" encoding="UTF-8"?>\n' + chkU
     chk2 = chkU
-    chk3 = '<root ><node >this – that.</node ></root >'
     self.assertXmlEqual(src, chk1)
     self.assertXmlEqual(src, chk2)
-    self.assertXmlEqual(src, chk3)
+    if six.PY2:
+      chk3 = '<root ><node >this – that.</node ></root >'
+      self.assertXmlEqual(src, chk3)
 
 #------------------------------------------------------------------------------
 # end of $Id$

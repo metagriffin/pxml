@@ -23,8 +23,13 @@
 Pretty-prints XML, nothing more :)
 '''
 
-#------------------------------------------------------------------------------
-import sys, re, argparse, xml.dom, xml.dom.minidom, pkg_resources, six
+import sys
+import re
+import argparse
+import xml.dom
+import xml.dom.minidom
+import pkg_resources
+import six
 import blessings
 
 #------------------------------------------------------------------------------
@@ -56,7 +61,7 @@ def removeIgnorableWhitespace(node):
 def indentXml(doc, node, indentString, level=0):
   if node.nodeType != node.ELEMENT_NODE \
       or len(node.childNodes) <= 0 \
-      or len(filter(lambda n: n.nodeType != n.TEXT_NODE, node.childNodes)) <= 0:
+      or not [n for n in node.childNodes if n.nodeType != n.TEXT_NODE]:
     return
 
   # todo: this makes the sequence '<a><b>foo</b></a>' render un-indented...
@@ -85,19 +90,19 @@ def indentXml(doc, node, indentString, level=0):
 
 #------------------------------------------------------------------------------
 def cxml_xmlescape(value, quote=False):
-  value = value.replace('&', '&amp;')
+  value = value.replace(b'&', b'&amp;')
   if quote:
-    value = value.replace('"', '&quot;')
+    value = value.replace(b'"', b'&quot;')
   return value \
-         .replace('<', '&lt;') \
-         .replace('>', '&gt;')
+         .replace(b'<', b'&lt;') \
+         .replace(b'>', b'&gt;')
 
 #------------------------------------------------------------------------------
 def cxml_attribute(node, output, enc, cspec):
-  output.write(' ' + cspec.attributeName(node.nodeName.encode(enc)))
-  output.write(cspec.attributeDelim('="'))
+  output.write(b' ' + cspec.attributeName(node.nodeName).encode(enc))
+  output.write(cspec.attributeDelim('="').encode(enc))
   output.write(cxml_xmlescape(node.nodeValue.encode(enc), True))
-  output.write(cspec.attributeDelim('"'))
+  output.write(cspec.attributeDelim('"').encode(enc))
 
 #------------------------------------------------------------------------------
 def cxml_text(node, output, enc, cspec):
@@ -107,25 +112,25 @@ def cxml_text(node, output, enc, cspec):
 
 #------------------------------------------------------------------------------
 def cxml_comment(node, output, enc, cspec):
-  output.write(cspec.comment('<!--%s-->' % (node.nodeValue.encode(enc),)))
+  output.write(cspec.comment('<!--%s-->' % (node.nodeValue,)).encode(enc))
 
 #------------------------------------------------------------------------------
 def cxml_cdata(node, output, enc, cspec):
-  output.write(cspec.xmlDeclaration('<![CDATA['))
-  output.write(node.nodeValue.encode(enc))
-  output.write(cspec.xmlDeclaration(']]>'))
+  output.write(cspec.xmlDeclaration('<![CDATA[').encode(enc))
+  output.write(node.nodeValue.encode(enc).encode(enc))
+  output.write(cspec.xmlDeclaration(']]>').encode(enc))
 
 #------------------------------------------------------------------------------
 def cxml_element(node, output, enc, cspec):
-  output.write(cspec.angleBracket('<'))
-  output.write(cspec.elementName(node.nodeName.encode(enc)))
+  output.write(cspec.angleBracket('<').encode(enc))
+  output.write(cspec.elementName(node.nodeName).encode(enc))
   if node.hasAttributes():
     for attr in node.attributes.values():
       cxml_attribute(attr, output, enc, cspec)
   if not node.hasChildNodes():
-    output.write(cspec.angleBracket('/>'))
+    output.write(cspec.angleBracket('/>').encode(enc))
     return
-  output.write(cspec.angleBracket('>'))
+  output.write(cspec.angleBracket('>').encode(enc))
   for child in node.childNodes:
     # node types: ELEMENT_NODE, ATTRIBUTE_NODE, TEXT_NODE,
     # CDATA_SECTION_NODE, ENTITY_NODE, PROCESSING_INSTRUCTION_NODE,
@@ -138,9 +143,9 @@ def cxml_element(node, output, enc, cspec):
     if func is None:
       raise TypeError('unexpected node type "%d"' % (child.nodeType,))
     func(child, output, enc, cspec)
-  output.write(cspec.angleBracket('</'))
-  output.write(cspec.elementName(node.nodeName.encode(enc)))
-  output.write(cspec.angleBracket('>'))
+  output.write(cspec.angleBracket('</').encode(enc))
+  output.write(cspec.elementName(node.nodeName).encode(enc))
+  output.write(cspec.angleBracket('>').encode(enc))
 
 #------------------------------------------------------------------------------
 def cxml_document(doc, output, enc, cspec):
@@ -150,7 +155,7 @@ def cxml_document(doc, output, enc, cspec):
     raise TypeError('expected to colorize either XML document or element (not %r)' %
                     doc.nodeType)
   output.write(cspec.xmlDeclaration(
-      '<?xml version="1.0" encoding="%s"?>' % (enc,)) + '\n')
+    '<?xml version="1.0" encoding="%s"?>' % (enc,)).encode(enc) + b'\n')
   return cxml_element(doc, output, enc, cspec)
 
 #------------------------------------------------------------------------------
@@ -175,7 +180,7 @@ def colorizeXml(dom, output, encoding=DEFAULT_ENCODING, colorspec=None):
   if colorspec is None or colorspec is True:
     colorspec = ColorSpec()
   cxml_document(dom, output, encoding, colorspec)
-  output.write('\n')
+  output.write(b'\n')
   return True
 
 #------------------------------------------------------------------------------
@@ -239,8 +244,8 @@ def prettify(input, output, strict=True, indentString='  ', color=False,
   indentXml(dom, dom.documentElement, indentString)
   if color:
     return colorizeXml(dom, output, encoding=encoding, colorspec=color)
-  xout = dom.toxml(encoding=encoding) + '\n'
-  output.write(re.sub(r'^(<\?xml[^>]+?>)', '\\1\n', xout))
+  xout = dom.toxml(encoding=encoding) + b'\n'
+  output.write(re.sub(b'^(<\\?xml[^>]+?>)', b'\\1\n', xout))
   return True
 
 #------------------------------------------------------------------------------
@@ -254,16 +259,23 @@ class XmlTestMixin(object):
     try:
       return self.assertEqual(dom1, dom2, msg=msg)
     except AssertionError:
-      out1 = six.StringIO()
-      out2 = six.StringIO()
-      prettify(six.StringIO(xml1), out1)
-      prettify(six.StringIO(xml2), out2)
-      return self.assertMultiLineEqual(out1.getvalue(), out2.getvalue(), msg=msg)
+      out1 = six.BytesIO()
+      out2 = six.BytesIO()
+      prettify(six.BytesIO(xml1), out1)
+      prettify(six.BytesIO(xml2), out2)
+      out1 = out1.getvalue()
+      out2 = out2.getvalue()
+      try: out1 = out1.decode()
+      except: out1 = str(out1)
+      try: out2 = out2.decode()
+      except: out2 = str(out2)
+      return self.assertMultiLineEqual(out1, out2, msg=msg)
   def assertNotXmlEqual(self, xml1, xml2, msg=None):
     try:
       self.assertXmlEqual(xml1, xml2)
       self.fail(msg or '%r == %r' % (xml1, xml2))
-    except AssertionError: return
+    except AssertionError:
+      return
 
 #------------------------------------------------------------------------------
 def main(args=None):
@@ -272,7 +284,7 @@ def main(args=None):
     usage='%(prog)s [options] [FILENAME | "-"]',
     description='Pretty-prints XML, nothing more :)',
     epilog='%(prog)s ' + lib.version,
-    )
+  )
 
   cli.add_argument(
     '-s', '--strict',
@@ -301,7 +313,8 @@ def main(args=None):
     source = sys.stdin
   else:
     source = open(options.filename, 'rb')
-  prettify(source, sys.stdout, options.strict, options.indent, options.color)
+  output = sys.stdout if six.PY2 else sys.stdout.buffer
+  prettify(source, output, options.strict, options.indent, options.color)
   return 0
 
 #------------------------------------------------------------------------------
