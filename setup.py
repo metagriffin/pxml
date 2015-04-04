@@ -20,9 +20,10 @@
 # along with this program. If not, see http://www.gnu.org/licenses/.
 #------------------------------------------------------------------------------
 
-import sys, os, re, setuptools
+import sys, os, setuptools
 from setuptools import setup, find_packages
 
+# require python 2.7+
 if sys.hexversion < 0x02070000:
   raise RuntimeError('This package requires python 2.7 or better')
 
@@ -34,19 +35,19 @@ def read(*parts, **kw):
 test_dependencies = [
   'nose                 >= 1.3.0',
   'coverage             >= 3.5.3',
-  ]
+]
 
 dependencies = [
   'distribute           >= 0.6.24',
   'blessings            >= 1.5',
   'six                  >= 1.4.1',
-  ]
+]
 
 entrypoints = {
   'console_scripts': [
     'pxml               = pxml:main',
-    ],
-  }
+  ],
+}
 
 classifiers = [
   'Development Status :: 5 - Production/Stable',
@@ -60,7 +61,7 @@ classifiers = [
   'Topic :: Software Development :: Libraries :: Python Modules',
   'Topic :: Utilities',
   'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
-  ]
+]
 
 setup(
   name                  = 'pxml',
