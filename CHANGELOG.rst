@@ -3,6 +3,12 @@ ChangeLog
 =========
 
 
+v0.2.11
+=======
+
+* Added Python 3 support
+
+
 v0.2.10
 =======
 
