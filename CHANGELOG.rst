@@ -3,6 +3,13 @@ ChangeLog
 =========
 
 
+v0.2.12
+=======
+
+* Removed `distribute` dependency (thanks jlec)
+* Fixed `test_different_xml` unit test for Python 3.3.6 (thanks jlec)
+
+
 v0.2.11
 =======
 
