@@ -38,7 +38,6 @@ test_dependencies = [
 ]
 
 dependencies = [
-  'distribute           >= 0.6.24',
   'blessings            >= 1.5',
   'six                  >= 1.4.1',
 ]
