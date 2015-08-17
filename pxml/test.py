@@ -22,6 +22,7 @@
 import unittest
 import six
 import pxml
+import sys
 
 #------------------------------------------------------------------------------
 class TestPxml(unittest.TestCase):
@@ -113,8 +114,18 @@ u'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</ro
 +   <node a="0" b="1"/>
   </root>
 ''')
+    elif sys.hexversion < 0x3040000:
+      # python 3 to 3.4 (strings are always unicode)
+      self.assertMultiLineEqual(str(cm.exception), '''\
+'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root>\\ [truncated]... != '<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root>\\ [truncated]...
+  <?xml version="1.0" encoding="UTF-8"?>
+  <root>
+-   <node a="1" b="0"/>
++   <node a="0" b="1"/>
+  </root>
+''')
     else:
-      # python 3... (its truncation algorithm is different)
+      # python 3.4+... (its truncation algorithm is different)
       self.assertMultiLineEqual(str(cm.exception), '''\
 '<?xm[14 chars]" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</root>\\n' != '<?xm[14 chars]" encoding="UTF-8"?>\\n<root>\\n  <node a="0" b="1"/>\\n</root>\\n'
   <?xml version="1.0" encoding="UTF-8"?>
