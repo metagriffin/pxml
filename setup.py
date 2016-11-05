@@ -69,7 +69,7 @@ setup(
   long_description      = read('README.rst'),
   classifiers           = classifiers,
   author                = 'metagriffin',
-  author_email          = 'mg.pypi@uberdev.org',
+  author_email          = 'mg.pypi@metagriffin.net',
   url                   = 'http://github.com/metagriffin/pxml',
   keywords              = 'pretty xml command-line library',
   packages              = find_packages(),
