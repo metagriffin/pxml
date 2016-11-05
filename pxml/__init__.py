@@ -252,8 +252,8 @@ def prettify(input, output, strict=True, indentString='  ', color=False,
 class XmlTestMixin(object):
   def assertXmlEqual(self, xml1, xml2, msg=None):
     try:
-      dom1 = xml.dom.minidom.parseString(xml1)
-      dom2 = xml.dom.minidom.parseString(xml2)
+      dom1 = xml.dom.minidom.parseString(xml1.strip())
+      dom2 = xml.dom.minidom.parseString(xml2.strip())
     except Exception:
       return self.assertEqual(xml1, xml2, msg=msg)
     try:
@@ -261,8 +261,8 @@ class XmlTestMixin(object):
     except AssertionError:
       out1 = six.BytesIO()
       out2 = six.BytesIO()
-      prettify(six.BytesIO(xml1), out1)
-      prettify(six.BytesIO(xml2), out2)
+      prettify(six.BytesIO(xml1.strip()), out1)
+      prettify(six.BytesIO(xml2.strip()), out2)
       out1 = out1.getvalue()
       out2 = out2.getvalue()
       try: out1 = out1.decode()

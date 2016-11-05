@@ -147,6 +147,17 @@ u'<?xml version="1.0" encoding="UTF-8"?>\\n<root>\\n  <node a="1" b="0"/>\\n</ro
       chk3 = '<root ><node >this – that.</node ></root >'
       self.assertXmlEqual(src, chk3)
 
+  #----------------------------------------------------------------------------
+  def test_prefixedWhitespace(self):
+    src = '''
+      <?xml version="1.0" encoding="UTF-8"?>
+      <root   x="y" foo="bar"     />
+    '''
+    chk = '<root foo="bar" x="y"/>'
+    self.assertXmlEqual(src, chk)
+
+
 #------------------------------------------------------------------------------
 # end of $Id$
+# $ChangeLog$
 #------------------------------------------------------------------------------
