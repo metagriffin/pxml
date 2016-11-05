@@ -3,6 +3,13 @@ ChangeLog
 =========
 
 
+v0.2.13
+=======
+
+* Added ignoring of leading & trailing whitespace in
+  `XmlTestMixin.assertXmlEqual`
+
+
 v0.2.12
 =======
 
